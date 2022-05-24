@@ -29,5 +29,10 @@
     "exclude-from-classmap": [
       "/tests/"
     ]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Kilik\\TranslationBundle\\Tests": "tests"
+    }
   }
 }

@@ -5,13 +5,15 @@
 
 namespace Kilik\TranslationBundle\Command;
 
-use Kilik\TranslationBundle\Services\LoadTranslationService;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Kilik\TranslationBundle\Factory\ExportSettingsModelFactory;
+use Kilik\TranslationBundle\Services\ReporterService;
+use Kilik\TranslationBundle\Services\TranslationsExporter;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * Class ExportCommand.
@@ -19,19 +21,35 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ExportCommand extends Command
 {
 
-    /**
-     * Load translation service
-     *
-     * @var LoadTranslationService
-     */
-    private $loadService;
+    private TranslationsExporter $translationsExporter;
+    private ExportSettingsModelFactory $exportSettingsModelFactory;
+    private ReporterService $reporterService;
 
     /**
-     * @param LoadTranslationService $service
+     * @required
      */
-    public function setLoadService(LoadTranslationService $service)
+    #[Required]
+    public function setTranslationsExporter(TranslationsExporter $translationsExporter): void
     {
-        $this->loadService = $service;
+        $this->translationsExporter = $translationsExporter;
+    }
+
+    /**
+     * @required
+     */
+    #[Required]
+    public function setExportSettingsModelFactory(ExportSettingsModelFactory $exportSettingsModelFactory): void
+    {
+        $this->exportSettingsModelFactory = $exportSettingsModelFactory;
+    }
+
+    /**
+     * @required
+     */
+    #[Required]
+    public function setReporterService(ReporterService $reporterService): void
+    {
+        $this->reporterService = $reporterService;
     }
 
     /**
@@ -54,95 +72,17 @@ class ExportCommand extends Command
     /**
      * @inheritdoc
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $bundlesNames = explode(',', $input->getArgument('bundles'));
+        $model = $this->exportSettingsModelFactory->createFromConsoleInput($input);
 
-        $locale = $input->getArgument('locale');
-        $locales = explode(',', $input->getArgument('locales'));
-        $domains = explode(',', $input->getOption('domains'));
+        $this->reporterService->addReporter(
+            fn($data) => $output->writeln(sprintf('<info>%s</info>', $data))
+        );
+        $this->translationsExporter->export($model);
 
-        $separator = $input->getOption('separator');
+        $output->writeln('<info>Saving translations to : '.$model->getFileName().' (CSV tab separated value).</info>');
 
-        // load all translations
-        foreach ($bundlesNames as $bundleName) {
-            // fix symfony 4 applications (use magic bundle name "app")
-            if ('app' === $bundleName) {
-                // locales to export
-                $this->loadService->loadAppTranslationFiles($locales, $domains);
-                // locale reference
-                $this->loadService->loadAppTranslationFiles([$locale], $domains);
-            } else {
-                $bundle = $this->getApplication()->getKernel()->getBundle($bundleName);
-
-                if (method_exists($bundle, 'getParent') && null !== $bundle->getParent()) {
-                    $bundles = $this->getApplication()->getKernel()->getBundle($bundle->getParent(), false);
-                    $bundle = $bundles[1];
-                    $output->writeln('<info>Using: '.$bundle->getName().' as bundle to lookup translations files for.</info>');
-                }
-
-                // locales to export
-                $this->loadService->loadBundleTranslationFiles($bundle, $locales, $domains);
-                // locale reference
-                $this->loadService->loadBundleTranslationFiles($bundle, [$locale], $domains);
-            }
-        }
-
-        // and export data as CSV (tab separated values)
-        $columns = ['Bundle', 'Domain', 'Key', $locale];
-        foreach ($locales as $localeColumn) {
-            $columns[] = $localeColumn;
-        }
-
-        $buffer = implode($separator, $columns).PHP_EOL;
-
-        foreach ($this->loadService->getTranslations() as $bundleName => $domains) {
-            foreach ($domains as $domain => $translations) {
-                foreach ($translations as $trKey => $trLocales) {
-                    $missing = false;
-
-                    $data = [$bundleName, $domain, $trKey];
-                    if (isset($trLocales[$locale])) {
-                        $data[] = $this->fixMultiLine($trLocales[$locale]);
-                    } else {
-                        $data[] = '';
-                        $missing = true;
-                    }
-
-                    foreach ($locales as $trLocale) {
-                        if (isset($trLocales[$trLocale])) {
-                            $data[] = $this->fixMultiLine($trLocales[$trLocale]);
-                        } else {
-                            $data[] = '';
-                            $missing = true;
-                        }
-                    }
-
-                    if (!$input->getOption('only-missing') || $missing) {
-                        $buffer .= implode($separator, $data).PHP_EOL;
-                    }
-                }
-            }
-        }
-        file_put_contents($input->getArgument('csv'), $buffer);
-        $output->writeln('<info>Saving translations to : '.$input->getArgument('csv').' (CSV tab separated value).</info>');
         return Command::SUCCESS;
-    }
-
-    /**
-     * Makes sure translation files with multi line strings result in correct csv files.
-     *
-     * @param string $str
-     *
-     * @return string
-     */
-    protected function fixMultiLine($str)
-    {
-        $str = str_replace(PHP_EOL, "\\n", $str);
-        if (substr($str, -2) === "\\n") {
-            $str = substr($str, 0, -2);//Not doing this results in \n at the end of some strings after import.
-        }
-
-        return $str;
     }
 }
