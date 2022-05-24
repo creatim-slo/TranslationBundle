@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Kilik\TranslationBundle\Services;
 
 use Kilik\TranslationBundle\Model\ExportSettingsModel;
+use League\Csv\Writer;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 class TranslationsExporter
@@ -31,24 +32,6 @@ class TranslationsExporter
 
         $this->loadBundlesTranslations($bundlesNames, $exportSettingsModel);
         $this->exportTranslationsToFile($exportSettingsModel);
-    }
-
-
-    /**
-     * Makes sure translation files with multi line strings result in correct csv files.
-     *
-     * @param string $str
-     *
-     * @return string
-     */
-    protected function fixMultiLine($str)
-    {
-        $str = str_replace(PHP_EOL, "\\n", $str);
-        if (substr($str, -2) === "\\n") {
-            $str = substr($str, 0, -2);//Not doing this results in \n at the end of some strings after import.
-        }
-
-        return $str;
     }
 
     protected function loadBundlesTranslations(array $bundles, ExportSettingsModel $exportSettingsModel): void
@@ -106,47 +89,36 @@ class TranslationsExporter
 
     protected function exportTranslationsToFile(ExportSettingsModel $exportSettingsModel): void
     {
-        $locale = $exportSettingsModel->getLocale();
-        $locales = $exportSettingsModel->getLocales();
+        $locales = [$exportSettingsModel->getLocale(), ...$exportSettingsModel->getLocales()];
 
-        $separator = $exportSettingsModel->getSeparator();
+        $writer = Writer::createFromPath($exportSettingsModel->getFileName(), 'w+');
+        $writer->setDelimiter($exportSettingsModel->getSeparator());
 
-        // and export data as CSV (tab separated values)
-        $columns = ['Bundle', 'Domain', 'Key', $locale];
-        foreach ($locales as $localeColumn) {
-            $columns[] = $localeColumn;
-        }
+        $columns = ['Bundle', 'Domain', 'Key', ...$locales];
 
-        $buffer = implode($separator, $columns).PHP_EOL;
+        $writer->insertOne($columns);
 
         foreach ($this->loadTranslationService->getTranslations() as $bundleName => $domains) {
             foreach ($domains as $domain => $translations) {
                 foreach ($translations as $trKey => $trLocales) {
-                    $missing = false;
-
-                    $data = [$bundleName, $domain, $trKey];
-                    if (isset($trLocales[$locale])) {
-                        $data[] = $this->fixMultiLine($trLocales[$locale]);
-                    } else {
-                        $data[] = '';
-                        $missing = true;
-                    }
-
-                    foreach ($locales as $trLocale) {
-                        if (isset($trLocales[$trLocale])) {
-                            $data[] = $this->fixMultiLine($trLocales[$trLocale]);
-                        } else {
-                            $data[] = '';
-                            $missing = true;
-                        }
-                    }
-
-                    if (!$exportSettingsModel->isOnlyMissing() || $missing) {
-                        $buffer .= implode($separator, $data).PHP_EOL;
+                    if ($this->shouldExportRow($trLocales, $locales, $exportSettingsModel->isOnlyMissing())) {
+                        $translatedLocales = array_map(fn ($locale) => $trLocales[$locale] ?? '', $locales);
+                        $row = [$bundleName, $domain, $trKey, ...$translatedLocales];
+                        $writer->insertOne($row);
                     }
                 }
             }
         }
-        file_put_contents($exportSettingsModel->getFileName(), $buffer);
+    }
+
+    protected function shouldExportRow(array $translations, array $locales, bool $isMissingOnly): bool
+    {
+        if (!$isMissingOnly) {
+            return true;
+        }
+
+        // checks if at least one entry from $locales is missing in $translations,
+        // returns true in that case, else otherwise
+        return array_reduce($locales, fn ($prev, $locale) => $prev || !isset($translations[$locale]), false);
     }
 }

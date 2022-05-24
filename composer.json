@@ -15,7 +15,8 @@
     "symfony/yaml": "^5.4",
     "symfony/finder": "^5.4",
     "symfony/filesystem": "^5.4",
-    "symfony/console": "^5.4"
+    "symfony/console": "^5.4",
+    "league/csv": "^9.8"
   },
   "require-dev": {
     "symfony/http-kernel": "^5.4",
@@ -32,7 +33,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "Kilik\\TranslationBundle\\Tests": "tests"
+      "Kilik\\TranslationBundle\\Tests\\": "tests"
     }
   }
 }
