@@ -8,6 +8,7 @@ use Kilik\TranslationBundle\Model\ExportSettingsModel;
 use Kilik\TranslationBundle\Services\LoadTranslationService;
 use Kilik\TranslationBundle\Services\ReporterService;
 use Kilik\TranslationBundle\Services\TranslationsExporter;
+use League\Csv\Writer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -43,6 +44,7 @@ class TranslationsExporterTest extends TestCase
         $exporterSettingsModel->setLocales(['de', 'fr']);
         $exporterSettingsModel->setDomains($fixture['domains'] ?? []);
         $exporterSettingsModel->setOnlyMissing($fixture['onlyMissing'] ?? false);
+        $exporterSettingsModel->setIncludeUTF8Bom($fixture['includeBom'] ?? false);
 
         $exporter->export($exporterSettingsModel);
 
@@ -124,6 +126,27 @@ class TranslationsExporterTest extends TestCase
                 'onlyMissing' => true,
             ],
             'expectedContent' => "Bundle,Domain,Key,en,de,fr\n".
+                "app,messages,app.hello,Hello,,Salut\n",
+        ];
+
+        $cases['translations_with_bom'] = [
+            'fileName' => 'test1.csv',
+            'fixture' => [
+                'translations' => [
+                    'app' => [
+                        'messages' => [
+                            'app.hello' => [
+                                'en' => 'Hello',
+                                'fr' => 'Salut',
+                                'it' => 'Ciao',
+                            ]
+                        ],
+                    ],
+                ],
+                'domains' => [],
+                'includeBom' => true,
+            ],
+            'expectedContent' => Writer::BOM_UTF8."Bundle,Domain,Key,en,de,fr\n".
                 "app,messages,app.hello,Hello,,Salut\n",
         ];
 

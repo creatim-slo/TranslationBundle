@@ -18,6 +18,7 @@ class ExportSettingsModelFactory
         $model->setDomains(explode(',', $input->getOption('domains')));
         $model->setSeparator($input->getOption('separator'));
         $model->setOnlyMissing((bool) $input->getOption('only-missing'));
+        $model->setIncludeUTF8Bom((bool) $input->getOption('include-bom'));
         $model->setFileName($input->getArgument('csv'));
 
         return $model;

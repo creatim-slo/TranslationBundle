@@ -92,6 +92,12 @@ class TranslationsExporter
         $locales = [$exportSettingsModel->getLocale(), ...$exportSettingsModel->getLocales()];
 
         $writer = Writer::createFromPath($exportSettingsModel->getFileName(), 'w+');
+        if ($exportSettingsModel->isIncludeUTF8Bom()) {
+            // $writer->setOutputBOM(Writer::BOM_UTF8); is only supported when doing $writer->output and (string)
+            // have to do a hack for now since there is no "nice" way so far
+            (fn () => $this->document->fwrite(Writer::BOM_UTF8))->call($writer);
+
+        }
         $writer->setDelimiter($exportSettingsModel->getSeparator());
 
         $columns = ['Bundle', 'Domain', 'Key', ...$locales];

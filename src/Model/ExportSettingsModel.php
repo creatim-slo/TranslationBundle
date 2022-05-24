@@ -17,6 +17,7 @@ class ExportSettingsModel
     private array $domains;
     private string $separator;
     private bool $onlyMissing;
+    private bool $includeUTF8Bom;
     private string $fileName;
 
     public function getBundles(): array
@@ -87,5 +88,15 @@ class ExportSettingsModel
     public function setFileName(string $fileName): void
     {
         $this->fileName = $fileName;
+    }
+
+    public function isIncludeUTF8Bom(): bool
+    {
+        return $this->includeUTF8Bom;
+    }
+
+    public function setIncludeUTF8Bom(bool $includeUTF8Bom): void
+    {
+        $this->includeUTF8Bom = $includeUTF8Bom;
     }
 }

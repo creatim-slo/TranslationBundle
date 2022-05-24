@@ -66,6 +66,7 @@ class ExportCommand extends Command
             ->addArgument('csv', InputArgument::REQUIRED, 'Output CSV filename')
             ->addOption('domains', null, InputOption::VALUE_OPTIONAL, 'Domains', 'all')
             ->addOption('only-missing', null, InputOption::VALUE_NONE, 'Export only missing translations')
+            ->addOption('include-bom', null, InputOption::VALUE_NONE, 'Includes UTF-8 BOM header (compatibility with Excel)')
             ->addOption('separator', 'sep', InputOption::VALUE_REQUIRED, 'The character used as separator', "\t");
     }
 

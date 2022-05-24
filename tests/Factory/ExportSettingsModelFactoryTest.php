@@ -24,6 +24,7 @@ class ExportSettingsModelFactoryTest extends TestCase
             new InputOption('domains'),
             new InputOption('separator'),
             new InputOption('only-missing'),
+            new InputOption('include-bom'),
         ]);
         $input = new ArgvInput([], $definition);
         $input->setArgument('bundles', 'app,TestBundle');
@@ -49,6 +50,7 @@ class ExportSettingsModelFactoryTest extends TestCase
         $model->setDomains(['messages']);
         $model->setSeparator(',');
         $model->setOnlyMissing(false);
+        $model->setIncludeUTF8Bom(false);
 
         return $model;
     }
