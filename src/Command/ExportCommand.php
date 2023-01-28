@@ -1,13 +1,11 @@
 <?php
-/**
- * This class is inspired from https://github.com/lexik/LexikTranslationBundle.
- */
 
 namespace CavernBay\TranslationBundle\Command;
 
 use CavernBay\TranslationBundle\Factory\ExportSettingsModelFactory;
 use CavernBay\TranslationBundle\Services\ReporterService;
 use CavernBay\TranslationBundle\Services\TranslationsExporter;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,9 +13,12 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
-/**
- * Class ExportCommand.
- */
+#[AsCommand(
+    name: 'cavernbay:translation:export',
+    description: 'Export translations from project bundles to CSV file',
+    aliases: ['kilik:translation:export', 'cavern-bay:translation:export', 'cb:translation:export'],
+    hidden: false,
+)]
 class ExportCommand extends Command
 {
 
@@ -58,9 +59,6 @@ class ExportCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('cavernbay:translation:export')
-            ->setAliases(['kilik:translation:export', 'cavern-bay:translation:export', 'cb:translation:export'])
-            ->setDescription('Export translations from project bundles to CSV file')
             ->addArgument('locale', InputArgument::REQUIRED, 'Locale used as reference in application')
             ->addArgument('locales', InputArgument::REQUIRED, 'Locales to export missing translations')
             ->addArgument('bundles', InputArgument::REQUIRED, 'Bundles scope (app for symfony4 core application)')

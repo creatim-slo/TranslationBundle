@@ -6,14 +6,12 @@ services:
             $rootDir: '%kernel.project_dir%'
             $translationPath: '%translator.default_path%'
 
-    kilik.translation.command.export:
-    class: Kilik\TranslationBundle\Command\ExportCommand
+    cavern_bay.translation.command.export:
+    class: CavernBay\TranslationBundle\Command\ExportCommand
     tags:
         - { name: console.command, command: kilik:translation:export }
 
-  kilik.translation.command.import:
-    class: Kilik\TranslationBundle\Command\ImportCommand
-    calls:
-        - [ setLoadService, ['@kilik.translation.services.load_translation_service']]
-    tags:
-        - { name: console.command, command: kilik:translation:import }
+    cavern_bay.translation.command.import:
+        class: CavernBay\TranslationBundle\Command\ImportCommand
+        tags:
+            - { name: console.command, command: kilik:translation:import }

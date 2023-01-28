@@ -1,62 +1,46 @@
 <?php
-/**
- * This class is inspired from https://github.com/lexik/LexikTranslationBundle.
- */
 
 namespace CavernBay\TranslationBundle\Command;
 
-use CavernBay\TranslationBundle\Components\CsvLoader;
-use CavernBay\TranslationBundle\Services\LoadTranslationService;
+use CavernBay\TranslationBundle\Factory\ImportSettingsModelFactory;
+use CavernBay\TranslationBundle\Services\TranslationsImporter;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Yaml\Dumper;
 use Symfony\Contracts\Service\Attribute\Required;
 
-/**
- * Class ImportCommand.
- */
+#[AsCommand(
+    name: 'cavernbay:translation:import',
+    description: 'Import translations from CSV files to project bundles',
+    aliases: ['kilik:translation:import', 'cavern-bay:translation:import', 'cb:translation:import'],
+    hidden: false,
+)]
 class ImportCommand extends Command
 {
+    private ImportSettingsModelFactory $importSettingsModelFactory;
+    private TranslationsImporter $translationsImporter;
 
-    /**
-     * @var \Symfony\Component\Console\Input\InputInterface
-     */
-    private $input;
-
-    /**
-     * @var \Symfony\Component\Console\Output\OutputInterface
-     */
-    private $output;
-
-    /**
-     * Load translation service
-     *
-     * @var LoadTranslationService
-     */
-    private LoadTranslationService $loadService;
-
-    /**
-     * @param LoadTranslationService $service
-     */
     #[Required]
-    public function setLoadService(LoadTranslationService $service): void
+    public function setImportSettingsModelFactory(ImportSettingsModelFactory $importSettingsModelFactory): void
     {
-        $this->loadService = $service;
+        $this->importSettingsModelFactory = $importSettingsModelFactory;
+    }
+
+    #[Required]
+    public function setTranslationsImporter(TranslationsImporter $translationsImporter): void
+    {
+        $this->translationsImporter = $translationsImporter;
     }
 
     /**
      * @inheritdoc
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
-            ->setName('cavernbay:translation:import')
-            ->setAliases(['kilik:translation:export', 'cavern-bay:translation:export', 'cb:translation:export'])
-            ->setDescription('Import translations from CSV files to project bundles')
             ->addArgument('locales', InputArgument::REQUIRED, 'Locales to import from CSV file to bundles')
             ->addArgument('csv', InputArgument::REQUIRED, 'Output CSV filename')
             ->addOption('domains', null, InputOption::VALUE_OPTIONAL, 'Domains', 'all')
@@ -68,104 +52,15 @@ class ImportCommand extends Command
     /**
      * @inheritdoc
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->input = $input;
-        $this->output = $output;
+        $importSettingsModel = $this->importSettingsModelFactory->createFromConsoleInput($input);
+        $importedFiles = $this->translationsImporter->import($importSettingsModel);
 
-        $fs = new Filesystem();
-
-        $bundlesNames = explode(',', $input->getOption('bundles'));
-        $domains = explode(',', $input->getOption('domains'));
-        $locales = explode(',', $input->getArgument('locales'));
-
-        // load CSV file
-        $importTranslations = CsvLoader::load(
-            $input->getArgument('csv'), $bundlesNames, $domains, $locales, $input->getOption('separator')
-        );
-
-        // load translations for matched bundles
-        $bundles = [];
-
-        // load existing translations on working bundles
-        foreach ($importTranslations as $bundleName => $notused) {
-            if ('app' !== $bundleName) {
-                $bundle = $this->getApplication()->getKernel()->getBundle($bundleName);
-                $bundles[$bundleName] = $bundle;
-            } else {
-                $bundles['app'] = 'app';
-            }
+        foreach ($importedFiles as $importedFile) {
+            $output->writeln(sprintf('<info>File %s updated</info>', $importedFile));
         }
 
-        $this->loadService->loadBundlesTranslationFiles($bundles, $locales, $domains);
-
-        $allTranslations = $importTranslations;
-        // merge translations if we do not overwrite the data
-        if (!$input->getOption('overwrite-existing')) {
-            $allTranslations = array_replace_recursive($this->loadService->getTranslations(), $importTranslations);
-        }
-
-        // rewrite files (Bundle/domain.locale.yml)
-        foreach ($allTranslations as $bundleName => $bundleTranslations) {
-            foreach ($bundleTranslations as $domain => $domainTranslations) {
-                // sort translations
-                ksort($domainTranslations);
-
-                foreach ($locales as $locale) {
-                    // prepare array (only for locale)
-                    $localTranslations = [];
-                    foreach ($domainTranslations as $key => $localeTranslation) {
-                        if (isset($localeTranslation[$locale])) {
-                            $this->assignArrayByPath($localTranslations, $key, $localeTranslation[$locale]);
-                        }
-                    }
-
-                    // determines destination file name
-                    if ('app' === $bundleName) {
-                        $basePath = $this->loadService->getAppTranslationsPath();
-                    } else {
-                        $bundle = $bundles[$bundleName];
-                        $basePath = $bundle->getPath().'/Resources/translations';
-                    }
-                    $filePath = $basePath.'/'.$domain.'.'.$locale.'.yml';
-                    if (!$fs->exists($basePath)) {
-                        $fs->mkdir($basePath);
-                    }
-
-                    // prepare
-                    $ymlDumper = new Dumper(2);
-                    $ymlContent = $ymlDumper->dump($localTranslations, 10);
-
-                    $originalSha1 = null;
-                    if (file_exists($filePath)) {
-                        $originalSha1 = sha1_file($filePath);
-                    }
-                    file_put_contents($filePath, $ymlContent);
-                    $newSha1 = sha1_file($filePath);
-                    if ($newSha1 != $originalSha1) {
-                        $output->writeln('<info>'.$filePath.' updated</info>');
-                    }
-                }
-            }
-        }
         return Command::SUCCESS;
-    }
-
-    /**
-     * @param array  $arr
-     * @param string $path
-     * @param string $value
-     * @param string $delimiter
-     * @param string $escape
-     */
-    public function assignArrayByPath(&$arr, $path, $value, $delimiter = '.', $escape = '\\')
-    {
-        $keys = explode($delimiter, $path);
-
-        foreach ($keys as $key) {
-            $arr = &$arr[$key];
-        }
-
-        $arr = $value;
     }
 }
