@@ -5,10 +5,6 @@ CavernBay Translation Bundle
 
 CBTB (CavernBay Translation Bundle) is a tool to be used with Symfony Translator. It tries to simplify the exchanges with the (human) translators.
 
-**Note for Symfony 3.4+ / Symfony 4+ projects**
-
-> Since symfony applications are not a bundle, we use the special bundle name 'app' to handle import and export of application translations not located into a bundle
-
 From the command line you can export translations (filtering with bundles names, domains, and locales) to CSV (Tab separators).
 
 Your translator (colleague, service provider, etc...) can open CSV files with specific translator tools (or with Office Software).
@@ -40,6 +36,10 @@ Export translations
 
 Export translations to CSV:
 
+export all translations, with EN locale as reference to a file:
+
+    ./bin/console cb:translation:export en all all ~/translations.csv
+
 export translations, with EN locale as reference, and match missing translations to FR or ES to a file: 
 
     ./bin/console cb:translation:export en fr,es AcmeBundle ~/translations.csv
@@ -56,7 +56,7 @@ export only some domains:
 
     ./bin/console cb:translation:export en fr,es AcmeBundle --domains messages,validators ~/translations.csv
 
-export application only translations (Symfony 3.4+ / Symfony 4+1):
+export application only translations:
 
     ./bin/console cb:translation:export en fr app ~/translations.csv
 

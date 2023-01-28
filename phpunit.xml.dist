@@ -13,7 +13,7 @@
     </php>
 
     <testsuites>
-        <testsuite name="Kilik Translation Bundle Test Suite">
+        <testsuite name="CavernBay Translation Bundle Test Suite">
             <directory>./tests/</directory>
         </testsuite>
     </testsuites>
@@ -32,7 +32,7 @@
         <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener">
             <arguments>
                 <array>
-                    <element key="time-sensitive"><string>Kilik\TranslationBundle</string></element>
+                    <element key="time-sensitive"><string>CavernBay\TranslationBundle</string></element>
                 </array>
             </arguments>
         </listener>

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PHP_IMAGE=kilik/php:7.4-buster-dev
+PHP_IMAGE=php:8.1-cli
 
 if [ -t 0 ]
 then
