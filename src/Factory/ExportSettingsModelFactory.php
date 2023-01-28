@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Kilik\TranslationBundle\Factory;
+namespace CavernBay\TranslationBundle\Factory;
 
-use Kilik\TranslationBundle\Model\ExportSettingsModel;
+use CavernBay\TranslationBundle\Model\ExportSettingsModel;
 use Symfony\Component\Console\Input\InputInterface;
 
 class ExportSettingsModelFactory

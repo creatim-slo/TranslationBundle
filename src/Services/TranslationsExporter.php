@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Kilik\TranslationBundle\Services;
+namespace CavernBay\TranslationBundle\Services;
 
-use Kilik\TranslationBundle\Model\ExportSettingsModel;
+use CavernBay\TranslationBundle\Model\ExportSettingsModel;
 use League\Csv\Writer;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -43,13 +43,19 @@ class TranslationsExporter
                 continue;
             }
 
+            if ('all' === $bundle) {
+                $this->loadBundlesTranslations($this->kernel->getBundles(), $exportSettingsModel);
+            }
+
             $this->loadBundleTranslations($bundle, $exportSettingsModel);
         }
     }
 
-    protected function loadBundleTranslations($bundleName, ExportSettingsModel $exportSettingsModel): void
+    protected function loadBundleTranslations($bundle, ExportSettingsModel $exportSettingsModel): void
     {
-        $bundle = $this->kernel->getBundle($bundleName);
+        if (is_string($bundle)) {
+            $bundle = $this->kernel->getBundle($bundle);
+        }
 
         if (method_exists($bundle, 'getParent') && null !== $bundle->getParent()) {
             $bundles = $this->kernel->getBundle($bundle->getParent(), false);

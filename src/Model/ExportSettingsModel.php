@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Kilik\TranslationBundle\Model;
+namespace CavernBay\TranslationBundle\Model;
 
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 

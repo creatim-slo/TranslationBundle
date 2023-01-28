@@ -1,5 +1,5 @@
 {
-  "name": "kilik/translation-bundle",
+  "name": "cavernbay/translation-bundle",
   "description": "Symfony Tool to help Import/Export (missing) translations",
   "keywords": ["symfony", "translation"],
   "license": "MIT",
@@ -8,24 +8,28 @@
     {
       "name": "Michel NAUD",
       "role": "Author"
+    },
+    {
+      "name": "Andrius Petrauskis",
+      "role": "Author"
     }
   ],
   "require": {
-    "php": "^7.4||^8.0",
-    "symfony/yaml": "^5.4",
-    "symfony/finder": "^5.4",
-    "symfony/filesystem": "^5.4",
-    "symfony/console": "^5.4",
+    "php": "^8.1",
+    "symfony/yaml": "^5.4|^6.0",
+    "symfony/finder": "^5.4|^6.0",
+    "symfony/filesystem": "^5.4|^6.0",
+    "symfony/console": "^5.4|^6.0",
     "league/csv": "^9.8"
   },
   "require-dev": {
-    "symfony/http-kernel": "^5.4",
-    "symfony/phpunit-bridge": "^5.4",
-    "symfony/dependency-injection": "^5.4"
+    "symfony/http-kernel": "^5.4|^6.0",
+    "symfony/phpunit-bridge": "^5.4|^6.0",
+    "symfony/dependency-injection": "^5.4|^6.0"
   },
   "autoload": {
     "psr-4": {
-      "Kilik\\TranslationBundle\\": "src"
+      "CavernBay\\TranslationBundle\\": "src"
     },
     "exclude-from-classmap": [
       "/tests/"
@@ -33,7 +37,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "Kilik\\TranslationBundle\\Tests\\": "tests"
+      "CavernBay\\TranslationBundle\\Tests\\": "tests"
     }
   }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Kilik\TranslationBundle\Exception;
+namespace CavernBay\TranslationBundle\Exception;
 
 /**
  * Exception class thrown when a data is bad or missing

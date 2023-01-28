@@ -1,6 +1,6 @@
 <?php
 
-namespace Kilik\TranslationBundle\Services;
+namespace CavernBay\TranslationBundle\Services;
 
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;

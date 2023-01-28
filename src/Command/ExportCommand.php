@@ -3,11 +3,11 @@
  * This class is inspired from https://github.com/lexik/LexikTranslationBundle.
  */
 
-namespace Kilik\TranslationBundle\Command;
+namespace CavernBay\TranslationBundle\Command;
 
-use Kilik\TranslationBundle\Factory\ExportSettingsModelFactory;
-use Kilik\TranslationBundle\Services\ReporterService;
-use Kilik\TranslationBundle\Services\TranslationsExporter;
+use CavernBay\TranslationBundle\Factory\ExportSettingsModelFactory;
+use CavernBay\TranslationBundle\Services\ReporterService;
+use CavernBay\TranslationBundle\Services\TranslationsExporter;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -58,7 +58,8 @@ class ExportCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('kilik:translation:export')
+            ->setName('cavernbay:translation:export')
+            ->setAliases(['kilik:translation:export', 'cavern-bay:translation:export', 'cb:translation:export'])
             ->setDescription('Export translations from project bundles to CSV file')
             ->addArgument('locale', InputArgument::REQUIRED, 'Locale used as reference in application')
             ->addArgument('locales', InputArgument::REQUIRED, 'Locales to export missing translations')

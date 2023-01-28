@@ -1,8 +1,8 @@
 <?php
 
-namespace Kilik\TranslationBundle\Components;
+namespace CavernBay\TranslationBundle\Components;
 
-use Kilik\TranslationBundle\Exception\DataException;
+use CavernBay\TranslationBundle\Exception\DataException;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Translation\Loader\FileLoader;

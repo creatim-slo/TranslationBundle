@@ -3,11 +3,10 @@
  * This class is inspired from https://github.com/lexik/LexikTranslationBundle.
  */
 
-namespace Kilik\TranslationBundle\Command;
+namespace CavernBay\TranslationBundle\Command;
 
-use Kilik\TranslationBundle\Components\CsvLoader;
-use Kilik\TranslationBundle\Services\LoadTranslationService;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use CavernBay\TranslationBundle\Components\CsvLoader;
+use CavernBay\TranslationBundle\Services\LoadTranslationService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,6 +14,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Dumper;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * Class ImportCommand.
@@ -37,12 +37,13 @@ class ImportCommand extends Command
      *
      * @var LoadTranslationService
      */
-    private $loadService;
+    private LoadTranslationService $loadService;
 
     /**
      * @param LoadTranslationService $service
      */
-    public function setLoadService(LoadTranslationService $service)
+    #[Required]
+    public function setLoadService(LoadTranslationService $service): void
     {
         $this->loadService = $service;
     }
@@ -53,7 +54,8 @@ class ImportCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('kilik:translation:import')
+            ->setName('cavernbay:translation:import')
+            ->setAliases(['kilik:translation:export', 'cavern-bay:translation:export', 'cb:translation:export'])
             ->setDescription('Import translations from CSV files to project bundles')
             ->addArgument('locales', InputArgument::REQUIRED, 'Locales to import from CSV file to bundles')
             ->addArgument('csv', InputArgument::REQUIRED, 'Output CSV filename')
@@ -99,7 +101,7 @@ class ImportCommand extends Command
 
         $allTranslations = $importTranslations;
         // merge translations if we do not overwrite the data
-        if (!$this->input->getOption('overwrite-existing')) {
+        if (!$input->getOption('overwrite-existing')) {
             $allTranslations = array_replace_recursive($this->loadService->getTranslations(), $importTranslations);
         }
 

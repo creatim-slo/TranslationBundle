@@ -1,6 +1,6 @@
 <?php
 
-namespace Kilik\TranslationBundle\DependencyInjection;
+namespace CavernBay\TranslationBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;

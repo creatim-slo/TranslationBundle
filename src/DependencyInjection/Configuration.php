@@ -1,6 +1,6 @@
 <?php
 
-namespace Kilik\TranslationBundle\DependencyInjection;
+namespace CavernBay\TranslationBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;

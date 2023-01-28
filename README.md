@@ -1,7 +1,9 @@
-Kilik Translation Bundle
+CavernBay Translation Bundle
 ========================
 
-KTB (Kilik Translation Bundle) is a tool to be used with Symfony Translator. It tries to simplify the exchanges with the (human) translators.
+> This is a reworked fork of kilik/translation-bundle, adapted to symfony 5 and symfony 6 and php 8.1+. If you need translations for older versions, you can use kilik/translation-bundle instead
+
+CBTB (CavernBay Translation Bundle) is a tool to be used with Symfony Translator. It tries to simplify the exchanges with the (human) translators.
 
 **Note for Symfony 3.4+ / Symfony 4+ projects**
 
@@ -23,13 +25,13 @@ Concepts:
 Add this bundle to your application
 ===================================
 
-    composer require kilik/translation-bundle
+    composer require cavernbay/translation-bundle
 
-Than, add this line to your AppKernel.php:
+Then, add this line to your bundles.php:
 
         $bundles = [
             // ...
-            new Kilik\TranslationBundle\KilikTranslationBundle(),
+            new CavernBay\TranslationBundle\CavernBayTranslationBundle(),
             // ...
         ];
 
@@ -40,23 +42,23 @@ Export translations to CSV:
 
 export translations, with EN locale as reference, and match missing translations to FR or ES to a file: 
 
-    ./bin/console kilik:translation:export en fr,es AcmeBundle ~/translations.csv
+    ./bin/console cb:translation:export en fr,es AcmeBundle ~/translations.csv
 
 work on some bundles at the same time: 
 
-    ./bin/console kilik:translation:export en fr,es AcmeBundle,MyOtherBundle ~/translations.csv
+    ./bin/console cb:translation:export en fr,es AcmeBundle,MyOtherBundle ~/translations.csv
 
 export only lines with missing translations:
 
-    ./bin/console kilik:translation:export en fr,es AcmeBundle --only-missing ~/translations.csv
+    ./bin/console cb:translation:export en fr,es AcmeBundle --only-missing ~/translations.csv
 
 export only some domains:
 
-    ./bin/console kilik:translation:export en fr,es AcmeBundle --domains messages,validators ~/translations.csv
+    ./bin/console cb:translation:export en fr,es AcmeBundle --domains messages,validators ~/translations.csv
 
 export application only translations (Symfony 3.4+ / Symfony 4+1):
 
-    ./bin/console kilik:translation:export en fr app ~/translations.csv
+    ./bin/console cb:translation:export en fr app ~/translations.csv
 
 Import translations
 ===================
@@ -65,29 +67,29 @@ Import translations from CSV (translations are merged with your current project 
 
 import all translations from your CSV file, for a given locales:
 
-    ./bin/console kilik:translation:import fr ~/translations.csv
+    ./bin/console cb:translation:import fr ~/translations.csv
 
 import all translations from your CSV file, overriding existing translation keys:
 
-    ./bin/console kilik:translation:import fr ~/translations.csv -o
+    ./bin/console cb:translation:import fr ~/translations.csv -o
 
 import translations from your CSV file, for a specific bundle, for a given locales:
 
-    ./bin/console kilik:translation:import fr --bundles AcmeBundle ~/translations.csv
+    ./bin/console cb:translation:import fr --bundles AcmeBundle ~/translations.csv
 
 import translations from your CSV file, for domains, for a given locales:
 
-    ./bin/console kilik:translation:import fr --domains messages,validators AcmeBundle ~/translations.csv
+    ./bin/console cb:translation:import fr --domains messages,validators AcmeBundle ~/translations.csv
 
 you can also import translations with many locales:
 
-    ./bin/console kilik:translation:import fr,es,nl ~/translations.csv
+    ./bin/console cb:translation:import fr,es,nl ~/translations.csv
 
 import translations from your CSV file, for application only translations (Symfony 3.4+ / Symfony 4+1):
 
-    ./bin/console kilik:translation:import fr --bundles app ~/translations.csv
+    ./bin/console cb:translation:import fr --bundles app ~/translations.csv
 
-For bundle developpers
+For bundle developers
 ======================
 
 ```shell

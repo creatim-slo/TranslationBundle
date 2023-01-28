@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Kilik\TranslationBundle\Tests\Services;
+namespace CavernBay\TranslationBundle\Tests\Services;
 
-use Kilik\TranslationBundle\Model\ExportSettingsModel;
-use Kilik\TranslationBundle\Services\LoadTranslationService;
-use Kilik\TranslationBundle\Services\ReporterService;
-use Kilik\TranslationBundle\Services\TranslationsExporter;
+use CavernBay\TranslationBundle\Model\ExportSettingsModel;
+use CavernBay\TranslationBundle\Services\LoadTranslationService;
+use CavernBay\TranslationBundle\Services\ReporterService;
+use CavernBay\TranslationBundle\Services\TranslationsExporter;
 use League\Csv\Writer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
