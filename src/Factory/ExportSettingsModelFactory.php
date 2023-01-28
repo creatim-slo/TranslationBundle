@@ -23,4 +23,19 @@ class ExportSettingsModelFactory
 
         return $model;
     }
+
+    public function createForAllBundles(string $fileName, string $separator): ExportSettingsModel
+    {
+        $model = new ExportSettingsModel();
+        $model->setBundles(['all']);
+        $model->setLocale('en_US'); // TODO: use default configured locale if possible
+        $model->setLocales(['all']);
+        $model->setDomains(['all']);
+        $model->setSeparator($separator);
+        $model->setOnlyMissing(false);
+        $model->setIncludeUTF8Bom(true);
+        $model->setFileName($fileName);
+
+        return $model;
+    }
 }
