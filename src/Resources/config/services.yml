@@ -1,7 +1,14 @@
 services:
-  kilik.translation.services.load_translation_service:
-    arguments: ['%kernel.project_dir%','%translator.default_path%']
-    class: Kilik\TranslationBundle\Services\LoadTranslationService
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    bind:
+      $rootDir: '%kernel.project_dir%'
+      $translationPath: '%translator.default_path%'
+
+  CavernBay\TranslationBundle\:
+    resource: '../../*'
+    exclude: '../../{DependencyInjection,Exception,Model,CavernBayTranslationBundle.php}'
 
 imports:
   - { resource: commands.yml }

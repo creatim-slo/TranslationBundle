@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Kilik\TranslationBundle\Tests;
+namespace CavernBay\TranslationBundle\Tests;
 
-use Kilik\TranslationBundle\Exception\DataException;
-use Kilik\TranslationBundle\Components\CsvLoader;
-use Kilik\TranslationBundle\Services\LoadTranslationService;
+use CavernBay\TranslationBundle\Exception\DataException;
+use CavernBay\TranslationBundle\Components\CsvLoader;
+use CavernBay\TranslationBundle\Services\LoadTranslationService;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 

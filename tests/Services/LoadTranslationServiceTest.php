@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Kilik\TranslationBundle\Tests\Services;
+namespace CavernBay\TranslationBundle\Tests\Services;
 
-use Kilik\TranslationBundle\Services\LoadTranslationService;
+use CavernBay\TranslationBundle\Services\LoadTranslationService;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

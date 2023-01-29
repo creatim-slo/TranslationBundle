@@ -1,6 +1,6 @@
 <?php
 
-namespace Kilik\TranslationBundle\Services;
+namespace CavernBay\TranslationBundle\Services;
 
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -201,11 +201,11 @@ class LoadTranslationService
     protected function getFileNamePattern(array $locales, array $domains)
     {
         if (count($domains) > 1) {
-            $regex = sprintf('/((%s)\.(%s)\.(%s))/', implode('|', $domains), implode('|', $locales), implode('|', ['yml']));
+            $regex = sprintf('/((%s)\.(%s)\.(%s))/', implode('|', $domains), implode('|', $locales), implode('|', ['yml', 'yaml']));
         } elseif ($domains[0] == 'all') {
-            $regex = sprintf('/(.*\.(%s)\.(%s))/', implode('|', $locales), implode('|', ['yml']));
+            $regex = sprintf('/(.*\.(%s)\.(%s))/', implode('|', $locales), implode('|', ['yml', 'yaml']));
         } else {
-            $regex = sprintf('/'.$domains[0].'(.*\.(%s)\.(%s))/', implode('|', $locales), implode('|', ['yml']));
+            $regex = sprintf('/'.$domains[0].'(.*\.(%s)\.(%s))/', implode('|', $locales), implode('|', ['yml', 'yaml']));
         }
 
         return $regex;
