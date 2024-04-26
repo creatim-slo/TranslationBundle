@@ -15,7 +15,7 @@ class ImportSettingsModelFactory
         $model->setLocales(explode(',', $input->getArgument('locales')));
         $model->setCsv($input->getArgument('csv'));
         $model->setBundlesNames(explode(',', $input->getOption('bundles')));
-        $model->setOverwriteExisting($input->hasOption('overwrite-existing'));
+        $model->setOverwriteExisting($input->getOption('overwrite-existing'));
         $model->setDomains(explode(',', $input->getOption('domains')));
         $model->setSeparator($input->getOption('separator'));
 

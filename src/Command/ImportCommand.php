@@ -10,6 +10,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Contracts\Service\Attribute\Required;
 
 #[AsCommand(
@@ -55,6 +56,12 @@ class ImportCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $importSettingsModel = $this->importSettingsModelFactory->createFromConsoleInput($input);
+
+        if (true === $importSettingsModel->isOverwriteExisting()) {
+            $io = new SymfonyStyle($input, $output);
+            $importSettingsModel->setOverwriteExisting($io->confirm('Overwrite the existing translations, instead of merging them', false));
+        }
+
         $importedFiles = $this->translationsImporter->import($importSettingsModel);
 
         foreach ($importedFiles as $importedFile) {

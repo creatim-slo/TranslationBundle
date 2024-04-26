@@ -9,12 +9,13 @@ use CavernBay\TranslationBundle\Model\ImportSettingsModel;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Yaml\Dumper;
 
 class TranslationsImporter
 {
     public function __construct(
-        private Kernel $kernel,
+        private KernelInterface $kernel,
         private LoadTranslationService $loadTranslationService,
         private Filesystem $filesystem,
         private Dumper $dumper,
@@ -112,13 +113,13 @@ class TranslationsImporter
                 $basePath = $bundle->getPath().'/translations';
             }
         }
-        $filePath = sprintf('%s%s%s.%s.%s', $basePath, DIRECTORY_SEPARATOR, $domain, $locale, '.yaml');
+        $filePath = sprintf('%s%s%s.%s.%s', $basePath, DIRECTORY_SEPARATOR, $domain, $locale, 'yaml');
         if (!$this->filesystem->exists($filePath)) {
             // backwards compatibility with existing .yml files (as .yaml ir recommended)
-            $filePath = sprintf('%s%s%s.%s.%s', $basePath, DIRECTORY_SEPARATOR, $domain, $locale, '.yml');
+            $filePath = sprintf('%s%s%s.%s.%s', $basePath, DIRECTORY_SEPARATOR, $domain, $locale, 'yml');
         }
         if (!$this->filesystem->exists($filePath)) {
-            $filePath = sprintf('%s%s%s.%s.%s', $basePath, DIRECTORY_SEPARATOR, $domain, $locale, '.yaml');
+            $filePath = sprintf('%s%s%s.%s.%s', $basePath, DIRECTORY_SEPARATOR, $domain, $locale, 'yaml');
         }
         if (!$this->filesystem->exists($basePath)) {
             $this->filesystem->mkdir($basePath);

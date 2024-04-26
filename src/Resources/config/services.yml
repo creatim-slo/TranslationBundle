@@ -9,6 +9,13 @@ services:
   CavernBay\TranslationBundle\:
     resource: '../../*'
     exclude: '../../{DependencyInjection,Exception,Model,CavernBayTranslationBundle.php}'
+        
+  creatim.yaml.dumper:
+    class: Symfony\Component\Yaml\Dumper
 
-imports:
-  - { resource: commands.yml }
+  CavernBay\TranslationBundle\Services\TranslationsImporter:
+    arguments:
+      $dumper: '@creatim.yaml.dumper'
+
+#imports:
+#  - { resource: commands.yml }

@@ -44,7 +44,9 @@ class TranslationsExporter
             }
 
             if ('all' === $bundle) {
-                $this->loadBundlesTranslations($this->kernel->getBundles(), $exportSettingsModel);
+                $this->loadAppTranslations($exportSettingsModel);
+                $this->loadBundlesTranslations(array_keys($this->kernel->getBundles()), $exportSettingsModel);
+                return;
             }
 
             $this->loadBundleTranslations($bundle, $exportSettingsModel);
