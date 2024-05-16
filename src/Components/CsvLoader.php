@@ -76,7 +76,7 @@ class CsvLoader
                         foreach ($locales as $locale) {
                             // replace new line unescaped by reald newline (works good wy yaml dumper)
                             if (!isset($row[$localesKeys[$locale]])) {
-                                throw new DataException('missing column value on line '.$lineId.', column '.$localesKeys[$locale]);
+                                continue;
                             }
                             $value = str_replace('\n', "\n", $row[$localesKeys[$locale]]);
                             // keep only non blank translations

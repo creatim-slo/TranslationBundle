@@ -6,11 +6,13 @@ namespace CavernBay\TranslationBundle\Services;
 
 use CavernBay\TranslationBundle\Components\CsvLoader;
 use CavernBay\TranslationBundle\Model\ImportSettingsModel;
+use Sylius\Bundle\ThemeBundle\Translation\Provider\Loader\TranslatorLoaderProviderInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Yaml\Dumper;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TranslationsImporter
 {
@@ -41,6 +43,26 @@ class TranslationsImporter
             $importSettings->getDomains()
         );
 
+        if (count($bundles) > 1) {
+            
+            // import contains multiple bundles: write translations into app
+            
+            $loadedTranslations = $this->loadTranslationService->getTranslations();
+            if (!isset($loadedTranslations['app'])) {
+                throw new \Exception('App translations not loaded!');
+            }
+            $app = ['app' => []];
+            unset($loadedTranslations['app']);
+
+            $diff = $this->arrayRecursiveDiff($importTranslations, $loadedTranslations);
+
+            foreach ($diff as $bundle => $value) {
+                $app = array_replace_recursive($app, $value);
+            }
+
+            return $this->rewriteFiles(['app' => $app], $importSettings->getLocales(), ['app']);
+        }
+
         $allTranslations = $importTranslations;
         // merge translations if we do not overwrite the data
         if (!$importSettings->isOverwriteExisting()) {
@@ -49,6 +71,30 @@ class TranslationsImporter
 
         return $this->rewriteFiles($allTranslations, $importSettings->getLocales(), $bundles);
     }
+
+    protected function arrayRecursiveDiff($aArray1, $aArray2) {
+
+        $aReturn = array();
+
+        foreach ($aArray1 as $mKey => $mValue) {
+            if (array_key_exists($mKey, $aArray2)) {
+                if (is_array($mValue)) {
+                    $aRecursiveDiff = $this->arrayRecursiveDiff($mValue, $aArray2[$mKey]);
+                    if (count($aRecursiveDiff)) {
+                        $aReturn[$mKey] = $aRecursiveDiff;
+                    }
+                } else {
+                    if ($mValue != $aArray2[$mKey]) {
+                        $aReturn[$mKey] = $mValue;
+                    }
+                }
+            } else {
+                $aReturn[$mKey] = $mValue;
+            }
+        }
+        return $aReturn;
+    }
+
 
     private function rewriteFiles($allTranslations, $locales, $bundles): iterable
     {
@@ -61,6 +107,10 @@ class TranslationsImporter
                     $localTranslations = $this->prepareLocaleTranslations($domainTranslations, $locale);
 
                     $filePath = $this->getDestinationFilePath($bundleName, $bundles, $domain, $locale);
+
+                    if (count($localTranslations) === 0) {
+                        continue;
+                    }
 
                     $ymlContent = $this->dumper->dump($localTranslations, 10);
 

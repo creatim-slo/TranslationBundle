@@ -65,6 +65,11 @@ Import translations
 
 Import translations from CSV (translations are merged with your current project translations).
 
+!!! IMPORTANT !!!
+-----------------
+If imported file contains more than one bundle, only changed translations (from all bundles) will be saved into app /translations.
+
+
 import all translations from your CSV file, for a given locales:
 
     ./bin/console cb:translation:import fr ~/translations.csv
