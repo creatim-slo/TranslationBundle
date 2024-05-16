@@ -157,7 +157,11 @@ class TranslationsImporter
         $keys = explode($delimiter, $path);
 
         foreach ($keys as $key) {
-            $arr = &$arr[$key];
+            try {
+                $arr = &$arr[$key];
+            } catch (\Throwable $t) {
+                // ignore
+            }
         }
 
         $arr = $value;
