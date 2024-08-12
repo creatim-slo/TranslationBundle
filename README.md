@@ -21,7 +21,19 @@ Concepts:
 Add this bundle to your application
 ===================================
 
-    composer require cavernbay/translation-bundle
+Update composer.json:
+
+    "repositories": [
+        { "type": "git", "url": "git@github.com:creatim-slo/TranslationBundle.git" }
+    ],
+
+    "require": {
+        "cavernbay/translation-bundle": "dev-master"
+    }
+
+Run:
+
+    composer update cavernbay/translation-bundle
 
 Then, add this line to your bundles.php:
 
@@ -31,79 +43,21 @@ Then, add this line to your bundles.php:
             // ...
         ];
 
-Export translations
-===================
+Export translations examples
+============================
 
-Export translations to CSV:
+### export App bundle only
+    php bin/console cavernbay:translation:export sl en app path-to/app.csv
 
-export all translations, with EN locale as reference to a file:
+### export all bundles
+    php bin/console cavernbay:translation:export sl en all path-to/app.csv
 
-    ./bin/console cb:translation:export en all all ~/translations.csv
-
-export translations, with EN locale as reference, and match missing translations to FR or ES to a file: 
-
-    ./bin/console cb:translation:export en fr,es AcmeBundle ~/translations.csv
-
-work on some bundles at the same time: 
-
-    ./bin/console cb:translation:export en fr,es AcmeBundle,MyOtherBundle ~/translations.csv
-
-export only lines with missing translations:
-
-    ./bin/console cb:translation:export en fr,es AcmeBundle --only-missing ~/translations.csv
-
-export only some domains:
-
-    ./bin/console cb:translation:export en fr,es AcmeBundle --domains messages,validators ~/translations.csv
-
-export application only translations:
-
-    ./bin/console cb:translation:export en fr app ~/translations.csv
+### export SyliusShopBundle bundle only
+    php bin/console cavernbay:translation:export sl en SyliusShopBundle path-to/sylius_shop.csv
 
 Import translations
 ===================
 
-Import translations from CSV (translations are merged with your current project translations).
-
-!!! IMPORTANT !!!
------------------
-If imported file contains more than one bundle, only changed translations (from all bundles) will be saved into app /translations.
+    php bin/console cavernbay:translation:import sl,en path-to/app.csv
 
 
-import all translations from your CSV file, for a given locales:
-
-    ./bin/console cb:translation:import fr ~/translations.csv
-
-import all translations from your CSV file, overriding existing translation keys:
-
-    ./bin/console cb:translation:import fr ~/translations.csv -o
-
-import translations from your CSV file, for a specific bundle, for a given locales:
-
-    ./bin/console cb:translation:import fr --bundles AcmeBundle ~/translations.csv
-
-import translations from your CSV file, for domains, for a given locales:
-
-    ./bin/console cb:translation:import fr --domains messages,validators AcmeBundle ~/translations.csv
-
-you can also import translations with many locales:
-
-    ./bin/console cb:translation:import fr,es,nl ~/translations.csv
-
-import translations from your CSV file, for application only translations (Symfony 3.4+ / Symfony 4+1):
-
-    ./bin/console cb:translation:import fr --bundles app ~/translations.csv
-
-For bundle developers
-======================
-
-```shell
-# prepare tests
-./prepare-tests.sh
-
-# run tests
-./run-tests.sh
-
-# launch composer
-./scripts/composer.sh
-```
